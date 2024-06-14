@@ -118,12 +118,12 @@ export default function Home() {
           </label>
         </div>
 
-        <div className="flex flex-col w-full">
-          <div className="divider divider-warning"></div>
-        </div>
 
         <div className="space-y-3">
-          <p className="font-bold">Experience</p>
+          <div className='grid h-20 card rounded-none bg-base-300 bg-[#d8b4fe] mt-10'>
+            <h1 className='font-bold text-white p-2 font-mono text-2xl'>
+            Experience
+            </h1></div>
           {experienceFields.map((field, index) => (
             <div key={field.id} className="mb-4 flex items-center">
               <label className="input input-bordered flex items-center flex-grow">
@@ -155,12 +155,11 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="flex flex-col w-full mt-6">
-          <div className="divider divider-warning"></div>
-        </div>
-
         <div className="space-y-3">
-          <p className="font-bold">Projects</p>
+          <div className='grid h-20 card rounded-none bg-base-300 bg-[#d8b4fe] mt-10'>
+            <h1 className='font-bold text-white p-2 font-mono text-2xl'>
+            Projects
+            </h1></div>
           {projectFields.map((field, index) => (
             <div key={field.id} className="mb-8 flex items-center">
               <label className="input input-bordered flex items-center flex-grow">
@@ -192,12 +191,11 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="flex flex-col w-full mt-6">
-          <div className="divider divider-warning"></div>
-        </div>
-
         <div className="space-y-3">
-          <p className="font-bold">Skills</p>
+          <div className='grid h-20 card rounded-none bg-base-300 bg-[#d8b4fe] mt-10'>
+            <h1 className='font-bold text-white p-2 font-mono text-2xl'>
+            Skills
+            </h1></div>
           {skillFields.map((field, index) => (
             <div key={field.id} className="mb-8 flex items-center">
               <label className="input input-bordered flex items-center flex-grow">
@@ -222,8 +220,7 @@ export default function Home() {
             + Add Skill
           </button>
         </div>
-        <div className="divider divider-warning mt-20"></div>
-        <button className="btn btn-warning w-full mt-2" onClick={handleSave}>
+        <button className="btn btn-warning w-full mt-8" onClick={handleSave}>
           Save
         </button>
       </div>
