@@ -1,165 +1,80 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import ExperienceSection from "../components/ExperienceSection";
-import ProjectSection from "../components/ProjectSection";
-import EducationSection from "../components/EducationSection";
-import SkillsSection from "../components/SkillsSection";
-import CourseworkSection from "../components/CourseworkSection";
-import FormFields from "../components/FormFields";
-import { Experience, ExperienceField, Project, Education } from "@/utils/types";
 
-export default function MainForm() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    location: "",
-    phone: "",
-    github: "",
-    website: "",
-    jobDescription: "",
-  });
+export default function Home() {
+  const router = useRouter();
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [description, setDescription] = useState<string>("");
 
-  const [experience, setExperience] = useState<Experience[]>([
-    { company: "", duration: "", title: "", location: "", duties: [""] },
-  ]);
-
-  const [experienceFields, setExperienceFields] = useState<ExperienceField[]>([
-    { id: 1, experience: "", responsibilities: "" },
-  ]);
-
-  const [projects, setProjects] = useState<Project[]>([
-    { name: "", skills: [], date: "", details: [""] },
-  ]);
-
-  const [education, setEducation] = useState<Education[]>([
-    {
-      institution: "",
-      degree: "",
-      duration: "",
-      graduationStart: "",
-      graduationEnd: "",
-      gpa: "",
-      location: "",
-    },
-  ]);
-
-  const [skills, setSkills] = useState([""]);
-  const [coursework, setCoursework] = useState([""]);
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  const payload = {
-    personal: {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      github: formData.github,
-      website: formData.website,
-    },
-    education: education.map((edu) => ({
-      id: String(Math.random()),
-      university: edu.institution,
-      degree: edu.degree,
-      graduationStartYear: Number(edu.graduationStart),
-      graduationEndYear: Number(edu.graduationEnd),
-      gpa: edu.gpa,
-      location: edu.location,
-    })),
-    coursework,
-    experiences: experience.map((exp) => ({
-      id: String(Math.random()),
-      company: exp.company,
-      title: exp.title,
-      employmentDates: exp.duration,
-      location: exp.location,
-      details: exp.duties,
-    })),
-    projects: projects.map((proj) => ({
-      id: String(Math.random()),
-      title: proj.name,
-      technologies: proj.skills,
-      date: proj.date,
-      details: proj.details,
-    })),
-    skills: {
-      languages: skills,
-      developerTools: [],
-      technologiesFrameworks: [],
-    },
-    job_description: {
-      description: formData.jobDescription,
-    },
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      setUploadedFiles(files);
+    }
   };
 
-  try {
-    const response = await fetch('/api/submitForm', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to download PDF');
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'resume.pdf';
-    link.click();
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error('Error downloading PDF:', error);
-  }
-};
-
-
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl rounded-lg p-8 md:p-12 lg:w-3/4">
-        <form onSubmit={handleSubmit}>
-          <FormFields formData={formData} setFormData={setFormData} />
-          <ExperienceSection
-            experience={experience}
-            experienceFields={experienceFields}
-            setExperience={setExperience}
-            setExperienceFields={setExperienceFields}
-          />
-          <ProjectSection projects={projects} setProjects={setProjects} />
-          <EducationSection education={education} setEducation={setEducation} />
-          <SkillsSection skills={skills} setSkills={setSkills} />
-          <CourseworkSection
-            coursework={coursework}
-            setCoursework={setCoursework}
-          />
-          {/* Job Description Field */}
-          <div className="my-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Job Description
-            </label>
-            <textarea
-              value={formData.jobDescription}
-              onChange={(e) =>
-                setFormData({ ...formData, jobDescription: e.target.value })
-              }
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Enter job description"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-3 rounded-lg mt-4 hover:bg-blue-600"
-          >
-            Submit
-          </button>
-        </form>
+    <div
+      className="w-full h-screen flex flex-col items-center justify-center
+      bg-gradient-to-br from-neutral-800 to-neutral-950 px-4"
+    >
+      <h1 className="text-3xl font-bold mb-4 font-mono" style={{ color: "wheat" }}>
+        INTEREUM
+      </h1>
+
+      {/* Upload Button */}
+      <div className="w-full max-w-md flex flex-col items-center space-y-4">
+        <label
+          htmlFor="file-upload"
+          className="bg-neutral-800 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-neutral-700
+          hover:border-neutral-300 transition duration-200 ease-in-out flex items-center justify-center cursor-pointer"
+        >
+          Upload File
+          <span className="ml-2">▼</span>
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          onChange={handleFileInputChange}
+          multiple
+          className="hidden"
+        />
+        {uploadedFiles.length > 0 && (
+          <p className="text-gray-400 text-sm text-center">
+          {uploadedFiles[0].name}
+          </p>
+        )}
+
+        {/* Description Input */}
+        <textarea
+          placeholder="Enter description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-3/4 max-w-md bg-neutral-700 text-gray-300 placeholder-gray-500 px-4 py-2 h-20 outline-none
+          focus:ring-2 focus:ring-neutral-500 resize-none text-sm"
+        />
+
+        {/* Submit Button */}
+        <button
+          className="bg-neutral-800 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-neutral-700
+          hover:border-neutral-300 transition duration-200 ease-in-out active:border-neutral-600"
+          onClick={() => {
+            console.log({ uploadedFiles, description });
+            // Uncomment to navigate: router.push("/next-page");
+          }}
+        >
+          Submit
+        </button>
       </div>
+      <footer className="absolute bottom-8 text-white text-sm sm:text-lg flex items-center font-mono">
+        <span style={{ color: "wheat", fontFamily: "monospace" }}>
+          Made with ❤ by{" "}
+          <span className="cursor-pointer hover:underline">
+            <a href="https://hamzza.vercel.app/">Hamzza</a>
+          </span>
+        </span>
+      </footer>
     </div>
   );
 }

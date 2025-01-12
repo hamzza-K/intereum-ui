@@ -53,7 +53,9 @@ export default function EducationSection({
   return (
     <div className="space-y-3">
       <div className="grid h-20 card rounded-none bg-base-300 bg-[#d8b4fe] mt-10">
-        <h1 className="font-bold text-white p-2 font-mono text-2xl">Education</h1>
+        <h1 className="font-bold text-white p-2 font-mono text-2xl">
+          Education
+        </h1>
       </div>
       {education.map((edu, index) => (
         <div key={index} className="mb-8 relative">
@@ -89,7 +91,11 @@ export default function EducationSection({
                 className="input input-bordered flex-grow"
                 value={edu.graduationStart}
                 onChange={(e) =>
-                  handleEducationChange(index, "graduationStart", e.target.value)
+                  handleEducationChange(
+                    index,
+                    "graduationStart",
+                    e.target.value
+                  )
                 }
               />
               <div className="divider lg:divider-horizontal"></div>
@@ -140,6 +146,7 @@ export default function EducationSection({
         </div>
       ))}
       <button
+        type="button"
         className="btn btn-secondary w-full mt-4 py-2"
         onClick={handleAddEducation}
       >
@@ -148,4 +155,3 @@ export default function EducationSection({
     </div>
   );
 }
-

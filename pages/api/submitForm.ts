@@ -1,25 +1,57 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-type Data = {
-  message: string;
-};
-
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-  if (req.method === 'POST') {
-    const { formData, experience, projects, education, skills, coursework } = req.body;
-
-    console.log('Form Data:', formData);
-    console.log('Experience:', experience);
-    console.log('Projects:', projects);
-    console.log('Education:', education);
-    console.log('Skills:', skills);
-    console.log('Coursework:', coursework);
-
-    // Send a success response
-    res.status(200).json({ message: 'Data successfully received' });
-  } else {
-    // Handle any other HTTP method
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+
+  console.log('Received Payload:', req.body);
+
+  try {
+    const processResponse = await fetch(
+      'https://intereum-15483616172.us-east1.run.app/process-data/',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body),
+      }
+    );
+
+    if (!processResponse.ok) {
+      return res
+        .status(processResponse.status)
+        .json({ message: 'Failed to process data' });
+    }
+
+    const processedData = await processResponse.json();
+
+    const pdfResponse = await fetch(
+      'https://intereum-15483616172.us-east1.run.app/create-pdf/',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(processedData),
+      }
+    );
+
+    if (!pdfResponse.ok) {
+      return res
+        .status(pdfResponse.status)
+        .json({ message: 'Failed to generate PDF' });
+    }
+
+    const pdfBuffer = await pdfResponse.arrayBuffer();
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
+    res.status(200).send(Buffer.from(pdfBuffer));
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 }
+
