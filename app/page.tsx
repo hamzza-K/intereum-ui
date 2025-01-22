@@ -68,7 +68,7 @@ export default function Home() {
         </button>
       </div>
       <footer className="absolute bottom-8 text-white text-sm sm:text-lg flex items-center font-mono">
-        <span style={{ color: "wheat", fontFamily: "monospace" }}>
+        <span style={{ color: "wheat", fontFamily: "monospace", fontSize: 14 }}>
           Made with ❤ by{" "}
           <span className="cursor-pointer hover:underline">
             <a href="https://hamzza.vercel.app/">Hamzza</a>
