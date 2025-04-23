@@ -12,6 +12,8 @@ export default function Home() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [description, setDescription] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [extractedData, setExtractedData] = useState<any>(null);
+  const [showJson, setShowJson] = useState(false);
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -79,6 +81,7 @@ export default function Home() {
 
       const data = await response.json();
       console.log("📦 Extracted Data:", data);
+      setExtractedData(data);
 
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,6 +93,27 @@ export default function Home() {
       setIsSubmitting(false);
     }
   };
+
+  const handleDownload = async () => {
+    if (!extractedData) return;
+
+    const response = await fetch('/api/download-pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(extractedData),
+    });
+
+    const blob = await response.blob();
+    const url  = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href  = url;
+    link.download = 'updated_resume.pdf';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-950 px-4">
@@ -135,14 +159,39 @@ export default function Home() {
         />
 
         {/* Submit Button */}
-        <button
-          className="bg-neutral-800 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-neutral-700
-          hover:border-neutral-300 transition duration-200 ease-in-out active:border-neutral-600 disabled:opacity-50"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Processing..." : "Submit"}
-        </button>
+{extractedData ? (
+  <>
+    <div className="relative w-3/4 max-w-md flex">
+      <button
+        onClick={handleDownload}
+        className="bg-neutral-800 font-semibold py-2 px-4 w-3/4 border-b-2 border-neutral-700 hover:border-neutral-300 transition font-mono"
+      >
+        Download PDF
+      </button>
+      <button
+        onClick={() => setShowJson(!showJson)}
+        className="bg-neutral-800 border-l border-neutral-700 py-2 px-4 w-1/4 border-b-2 hover:border-neutral-300 transition font-mono flex items-center justify-center"
+      >
+        ▼
+      </button>
+    </div>
+    {showJson && (
+      <div className="w-3/4 max-w-md bg-neutral-900 text-sm text-green-400 mt-2 p-4 overflow-auto max-h-60 border border-neutral-700 font-mono">
+        <pre>{JSON.stringify(extractedData, null, 2)}</pre>
+      </div>
+    )}
+  </>
+) : (
+  <button
+    className="bg-neutral-800 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-neutral-700
+    hover:border-neutral-300 transition duration-200 ease-in-out active:border-neutral-600 disabled:opacity-50"
+    onClick={handleSubmit}
+    disabled={isSubmitting}
+  >
+    {isSubmitting ? "Processing..." : "Submit"}
+  </button>
+)}
+
       </div>
       <footer className="absolute bottom-8 text-white text-sm sm:text-lg flex items-center font-mono">
         <span style={{ color: "wheat", fontFamily: "monospace", fontSize: 14 }}>
