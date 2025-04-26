@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       formData.append("job_description", description);
 
       // 🔥 POST to FastAPI
-      const apiRes = await axios.post(process.env.PROD_API_ROUTE!, formData, {
+      const apiRes = await axios.post(process.env.API_ROUTE!, formData, {
         headers: formData.getHeaders(),
       });
 
