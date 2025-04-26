@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
   try {
-    const fastApiRes = await axios.post(process.env.PDF_ROUTE!, req.body, {
+    const fastApiRes = await axios.post(process.env.PROD_PDF_ROUTE!, req.body, {
       responseType: "arraybuffer", // 👈 This is important to handle binary data (PDF)
       headers: {
         "Content-Type": "application/json",

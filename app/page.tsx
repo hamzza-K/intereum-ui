@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import * as mammoth from "mammoth";
+import AjeebSpinner from "@/components/AjeebSpinner";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   process.env.NEXT_PUBLIC_PDF_WORKER_SRC!;
@@ -14,6 +15,7 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
   const [showJson, setShowJson] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -63,7 +65,8 @@ export default function Home() {
 
     try {
       // Get only the last uploaded file
-      const lastFile: File | undefined = uploadedFiles[uploadedFiles.length - 1];
+      const lastFile: File | undefined =
+        uploadedFiles[uploadedFiles.length - 1];
       // const content = await extractText(lastFile);
       // console.log("Resume Text: ", content);
 
@@ -71,12 +74,12 @@ export default function Home() {
 
       const formData = new FormData();
 
-      formData.append('resume_file', lastFile);
-      formData.append('description', description);
+      formData.append("resume_file", lastFile);
+      formData.append("description", description);
 
       const response = await fetch("/api/submit", {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
       const data = await response.json();
@@ -85,7 +88,6 @@ export default function Home() {
 
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-
     } catch (error) {
       console.error("Submission error:", error);
       alert("Submission failed. Please try again.");
@@ -97,23 +99,23 @@ export default function Home() {
   const handleDownload = async () => {
     if (!extractedData) return;
 
-    const response = await fetch('/api/download-pdf', {
-      method: 'POST',
+    const response = await fetch("/api/download-pdf", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(extractedData),
     });
 
     const blob = await response.blob();
-    const url  = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href  = url;
-    link.download = 'updated_resume.pdf';
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "updated_resume.pdf";
     document.body.appendChild(link);
     link.click();
     link.remove();
-  }
+  };
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-950 px-4">
@@ -159,39 +161,42 @@ export default function Home() {
         />
 
         {/* Submit Button */}
-{extractedData ? (
-  <>
-    <div className="relative w-3/4 max-w-md flex">
-      <button
-        onClick={handleDownload}
-        className="bg-neutral-800 font-semibold py-2 px-4 w-3/4 border-b-2 border-neutral-700 hover:border-neutral-300 transition font-mono"
-      >
-        Download PDF
-      </button>
-      <button
-        onClick={() => setShowJson(!showJson)}
-        className="bg-neutral-800 border-l border-neutral-700 py-2 px-4 w-1/4 border-b-2 hover:border-neutral-300 transition font-mono flex items-center justify-center"
-      >
-        ▼
-      </button>
-    </div>
-    {showJson && (
-      <div className="w-3/4 max-w-md bg-neutral-900 text-sm text-green-400 mt-2 p-4 overflow-auto max-h-60 border border-neutral-700 font-mono">
-        <pre>{JSON.stringify(extractedData, null, 2)}</pre>
-      </div>
-    )}
-  </>
-) : (
-  <button
-    className="bg-neutral-800 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-neutral-700
+        {extractedData ? (
+          <>
+            <div className="relative w-3/4 max-w-md flex">
+              <button
+                onClick={handleDownload}
+                className="bg-neutral-800 font-semibold py-2 px-4 w-3/4 border-b-2 border-neutral-700 hover:border-neutral-300 transition font-mono"
+              >
+                {isSubmitting ? (
+                  <AjeebSpinner text="Downloading..." />
+                ) : (
+                  "Download PDF"
+                )}
+              </button>
+              <button
+                onClick={() => setShowJson(!showJson)}
+                className="bg-neutral-800 border-l border-neutral-700 py-2 px-4 w-1/4 border-b-2 hover:border-neutral-300 transition font-mono flex items-center justify-center"
+              >
+                ▼
+              </button>
+            </div>
+            {showJson && (
+              <div className="w-3/4 max-w-md bg-neutral-900 text-sm text-green-400 mt-2 p-4 overflow-auto max-h-60 border border-neutral-700 font-mono">
+                <pre>{JSON.stringify(extractedData, null, 2)}</pre>
+              </div>
+            )}
+          </>
+        ) : (
+          <button
+            className="bg-neutral-800 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-neutral-700
     hover:border-neutral-300 transition duration-200 ease-in-out active:border-neutral-600 disabled:opacity-50"
-    onClick={handleSubmit}
-    disabled={isSubmitting}
-  >
-    {isSubmitting ? "Processing..." : "Submit"}
-  </button>
-)}
-
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? <AjeebSpinner text="Processing..." /> : "Submit"}
+          </button>
+        )}
       </div>
       <footer className="absolute bottom-8 text-white text-sm sm:text-lg flex items-center font-mono">
         <span style={{ color: "wheat", fontFamily: "monospace", fontSize: 14 }}>

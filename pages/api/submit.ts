@@ -46,11 +46,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       formData.append("job_description", description);
 
       // 🔥 POST to FastAPI
-      const apiRes = await axios.post(process.env.API_ROUTE!, formData, {
+      const apiRes = await axios.post(process.env.PROD_API_ROUTE!, formData, {
         headers: formData.getHeaders(),
       });
 
-      return res.status(apiRes.status).json(apiRes.data); // ✅ Ensure we respond to client
+      return res.status(apiRes.status).json(apiRes.data);
     } catch (error: any) {
       console.error("Error forwarding to FastAPI:", error);
       return res.status(500).json({ error: "Failed to forward data to backend" });
