@@ -1,18 +1,16 @@
 "use client";
-import { useRouter } from "next/navigation";
+
 import { useState } from "react";
 import AjeebSpinner from "@/components/AjeebSpinner";
 
 
 export default function Home() {
-  const router = useRouter();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [description, setDescription] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
   const [showJson, setShowJson] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [submissionSuccess, setSubmissionSuccess] = useState(false); // ✨ NEW
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -50,7 +48,8 @@ export default function Home() {
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      setSubmissionSuccess(true); // ✨ if successful, mark it
+      setSubmissionSuccess(true);
+
     } catch (error) {
       console.error("Submission error:", error);
       alert("Submission failed. Please try again.");
@@ -72,11 +71,28 @@ export default function Home() {
       body: JSON.stringify(extractedData),
     });
 
+    if (!response.ok) {
+      alert("Download failed.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
+
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let filename = "resume.pdf";
+
+    if (contentDisposition){
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+
     const link = document.createElement("a");
     link.href = url;
-    link.download = "updated_resume.pdf";
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -85,7 +101,6 @@ export default function Home() {
   };
 
   const handleStartOver = () => {
-    // ✨ Reset everything
     setUploadedFiles([]);
     setDescription("");
     setExtractedData(null);
