@@ -197,6 +197,14 @@ export default function Home() {
             >
               Start Over
             </button>
+
+            {/* Download Button */}
+            <button
+              onClick={handleDownload}
+              className="mt-4 bg-green-700 font-semibold py-2 px-6 w-3/4 max-w-md text-center font-mono border-b-2 border-green-900 hover:border-green-400 transition duration-200 ease-in-out active:border-green-600"
+            >
+             Download 
+            </button>
           </>
         )}
       </div>

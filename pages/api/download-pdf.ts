@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const contentDispositon = fastApiRes.headers["content-disposition"];
-    const filenameMatch = contentDispositon?.match('/filename="(.+)"/');
+    const filenameMatch = contentDispositon?.match(/filename="(.+)"/);
     const filename = filenameMatch?.[1] || "resume.pdf";
 
     // Set headers to prompt browser download
